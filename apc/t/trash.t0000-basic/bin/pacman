@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "pacman $*" >>"$apc_CALLS"
-exec /usr/bin/pacman "$@"

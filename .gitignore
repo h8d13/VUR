@@ -1,0 +1,7 @@
+pkg/
+src/
+
+# leaked build outputs inside recipe dirs (binaries belong in the repo db dir)
+pkgs/*/*.pkg.tar.zst
+pkgs/*/*.pkg.tar.zst.sig
+pkgs/*/*.tar.gz

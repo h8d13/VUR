@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "checkupdates $*" >>"$apc_CALLS"
-exec /home/hadean/.local/bin/checkupdates "$@"

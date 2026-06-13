@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "paccache $*" >>"$apc_CALLS"
-exec /home/hadean/.local/bin/paccache "$@"
