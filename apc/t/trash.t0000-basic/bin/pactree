@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "pactree $*" >>"$apc_CALLS"
+exec /home/hadean/.local/bin/pactree "$@"

@@ -1,0 +1,33 @@
+apc test suite
+================
+
+CI-ONLY. These tests run the REAL pacman / checkupdates / paccache / pactree /
+reflector: they install and remove packages, refresh the files database, and
+force-sync mirrors. Run them in the disposable CI container (Arch, root), never
+on a real host -- they will mutate it. The workflow installs the deps
+(pacman-contrib, reflector) and a synced db before running.
+
+git-style harness. Each t[0-9]*.sh sources test-lib.sh, which fronts each real
+tool with a thin wrapper: it appends the tool's argv to a per-script call log,
+then execs the real binary. So every command genuinely runs, and the tests can
+still assert WHICH underlying command apc issued (the 1:1 header -> flag map)
+via grep_call, on top of checking the real effect (e.g. install then pacman -Q).
+
+Run (inside CI, or a throwaway Arch root container):
+    sh t/run.sh                    # all scripts, PASS/FAIL with counts
+    sh t/run.sh -v                 # also dump each script's full log inline
+    (cd t && prove ./t[0-9]*.sh)   # TAP via prove, if installed
+    (cd t && sh t0200-list.sh)     # a single script
+
+Writing a test:
+    test_expect_success 'desc' '
+        reset_calls &&                       # clear the log right before...
+        apc --no-color install tree --noconfirm &&
+        grep_call "pacman -S" &&             # ...asserting the issued flag
+        pacman -Q tree                       # ...and the real effect
+    '
+
+Helpers: apc, reset_calls, grep_call, test_must_fail, test_cmp,
+test_when_finished. The call logger records pacman calls the test itself makes
+too, so reset_calls immediately before the apc invocation under test. Small
+real packages used: tree (install/uninstall/orphs), bash (queries).

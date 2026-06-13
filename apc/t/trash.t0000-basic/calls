@@ -1,0 +1,2 @@
+pacman -Ss bash
+pacman -Q
