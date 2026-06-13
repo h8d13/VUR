@@ -1,3 +1,5 @@
 # Arch Closed Repository
 
-rulesets are only available to public repos
+rulesets are only available to public repos:
+
+=> Require `--signoff` trailer in commits
