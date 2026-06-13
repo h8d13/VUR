@@ -1,3 +1,6 @@
 # Arch Closed Repository
 
-rulesets are only available to public repos
+- All commits require:
+	- A valid `GPG` key
+	- A valid DCO trailer: using `--signoff` or `-s` with `git`
+
