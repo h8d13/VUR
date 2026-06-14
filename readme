@@ -1,6 +1,19 @@
 # Arch Closed Repository
 
 - All commits require:
-	- A valid `GPG` key
+	- A valid `GPG` key to sign all commits + SSH setup (web commits will not be accepted)
 	- A valid DCO trailer: using `--signoff` or `-s` with `git`
+	- A valid review from the dictator himself
 
+## Recipe allowlist
+
+Under `pkgs/`, only packaging files are tracked — all source code and build
+artifacts are ignored, whatever the language. The `.gitignore` allowlist:
+
+- `PKGBUILD`, `.SRCINFO`, `.nvchecker.toml`
+- `*.install`, `*.patch`, `*.diff`, `*.hook`
+- `*.service`, `*.sysusers`, `*.tmpfiles`, `*.desktop`
+- `keys/**/*.asc`
+
+Anything else in a recipe dir (`.sh`, `.py`, `.rs`, tests, downloaded
+tarballs, `pkg/`, `src/`, built packages) is never committed.
