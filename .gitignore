@@ -12,6 +12,10 @@ src/
 # (!pkgs/**/ lets git descend into dirs to find the allowed files.)
 pkgs/**
 !pkgs/**/
+# ...but never descend back into makepkg build dirs (!pkgs/**/ re-included them).
+# Without this, an embedded VCS checkout under src/ leaks in as a git submodule.
+pkgs/**/pkg/
+pkgs/**/src/
 !pkgs/**/.directory
 !pkgs/**/PKGBUILD
 !pkgs/**/.SRCINFO
