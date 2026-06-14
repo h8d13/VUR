@@ -1,0 +1,14 @@
+name: ACR policy
+
+# Run on every branch push and every PR so non-compliant branches fail before merge.
+on:
+  push:
+  pull_request:
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package rules
+        run: bash check

@@ -10,15 +10,42 @@
 	- Require linear history
 	- Only through PRs
 
+## Package rules
+
+Every `pkgs/<name>/` recipe must satisfy (enforced by `./check`):
+
+1. **`-git` style only** `pkgname` ends in `-git` and `source=()` uses a
+   `git+` VCS source. No fixed-tarball packages.
+2. **No `.install` scriptlets** no `install=` line and no `*.install` file.
+   `*.install` is not on the allowlist, so it cannot even be committed.
+3. **At least one `# Maintainer:` line** in the PKGBUILD.
+
+Run `./check` before committing; CI runs it on every PR.
+
 ## Recipe allowlist
 
 Under `pkgs/`, only packaging files are tracked — all source code and build
 artifacts are ignored, whatever the language. The `.gitignore` allowlist:
 
 - `PKGBUILD`, `.SRCINFO`, `.nvchecker.toml`
-- `*.install`, `*.patch`, `*.diff`, `*.hook`
+- `*.patch`, `*.diff`, `*.hook`
 - `*.service`, `*.sysusers`, `*.tmpfiles`, `*.desktop`
 - `keys/**/*.asc`
 
 Anything else in a recipe dir (`.sh`, `.py`, `.rs`, tests, downloaded
 tarballs, `pkg/`, `src/`, built packages) is never committed.
+
+## Tooling
+
+Repo-root helper scripts:
+
+- `./check` — validate every recipe against the package rules above. Exits
+  non-zero on any violation.
+- `./clean` — remove all git-ignored build debris (`pkg/`, `src/`, fetched
+  sources, built packages) repo-wide, after a confirmation prompt.
+
+## CI
+
+GitHub Actions (`.github/workflows/check.yml`) runs `bash check` on **every
+branch push and every pull request**. A branch that violates any package rule
+fails CI and cannot be merged into `master`.

@@ -1,0 +1,51 @@
+#!/bin/bash
+# ACR policy checks. Run from the repo root: ./check
+# Validates every pkgs/<name>/PKGBUILD against the repository rules.
+#   1. only -git style packages (pkgname ends in -git AND has a git+ source)
+#   2. no .install pre/post scriptlets (no install= line, no *.install file)
+#   3. at least one '# Maintainer:' line
+set -u
+shopt -s nullglob
+
+fail=0
+checked=0
+
+for pkgbuild in pkgs/*/PKGBUILD; do
+	dir=$(dirname "$pkgbuild")
+	name=$(basename "$dir")
+	[[ "$name" == "template" ]] && continue
+	checked=$((checked + 1))
+
+	# Rule 1: -git style package
+	pkgname=$(sed -n "s/^pkgname=//p" "$pkgbuild" | tr -d "'\"" | head -1)
+	if [[ "$pkgname" != *-git ]]; then
+		echo "FAIL [$name]: pkgname '$pkgname' is not -git style"
+		fail=1
+	fi
+	if ! grep -qE '^[[:space:]]*source=.*git\+' "$pkgbuild"; then
+		echo "FAIL [$name]: no git+ VCS source"
+		fail=1
+	fi
+
+	# Rule 2: no install scriptlets
+	if grep -qE '^[[:space:]]*install=' "$pkgbuild"; then
+		echo "FAIL [$name]: install= scriptlet declared in PKGBUILD"
+		fail=1
+	fi
+	installs=("$dir"/*.install)
+	if (( ${#installs[@]} > 0 )); then
+		echo "FAIL [$name]: .install file present in recipe dir"
+		fail=1
+	fi
+
+	# Rule 3: at least one Maintainer line
+	if ! grep -qE '^#[[:space:]]*Maintainer:' "$pkgbuild"; then
+		echo "FAIL [$name]: missing '# Maintainer:' line"
+		fail=1
+	fi
+done
+
+if [[ $fail -eq 0 ]]; then
+	echo "ok: $checked package(s) pass ACR policy"
+fi
+exit $fail
