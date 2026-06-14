@@ -6,6 +6,10 @@
 	- Any web commits require an email linked and verified
 	- A valid review from the dictator himself
 
+- All commits on `master`:
+	- Require linear history
+	- Only through PRs
+
 ## Recipe allowlist
 
 Under `pkgs/`, only packaging files are tracked — all source code and build
