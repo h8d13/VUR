@@ -12,6 +12,7 @@ src/
 # (!pkgs/**/ lets git descend into dirs to find the allowed files.)
 pkgs/**
 !pkgs/**/
+!pkgs/**/.directory
 !pkgs/**/PKGBUILD
 !pkgs/**/.SRCINFO
 !pkgs/**/.gitignore
