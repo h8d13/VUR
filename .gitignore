@@ -1,7 +1,32 @@
+# --- makepkg build artifacts (any recipe dir, any depth) ---
 pkg/
 src/
+*.pkg.tar.*
+*.src.tar.*
+*.log
 
-# leaked build outputs inside recipe dirs (binaries belong in the repo db dir)
-pkgs/*/*.pkg.tar.zst
-pkgs/*/*.pkg.tar.zst.sig
-pkgs/*/*.tar.gz
+# --- recipe-only policy ---
+# Under pkgs/, commit ONLY packaging files. Everything else — source code
+# (.sh .py .rs .c .go ...), tests, downloaded tarballs — is ignored no
+# matter what. Allowlist, so a new language/extension can never sneak in.
+# (!pkgs/**/ lets git descend into dirs to find the allowed files.)
+pkgs/**
+!pkgs/**/
+!pkgs/**/PKGBUILD
+!pkgs/**/.SRCINFO
+!pkgs/**/.gitignore
+!pkgs/**/.nvchecker.toml
+!pkgs/**/*.install
+!pkgs/**/*.patch
+!pkgs/**/*.diff
+!pkgs/**/*.hook
+!pkgs/**/*.service
+!pkgs/**/*.sysusers
+!pkgs/**/*.tmpfiles
+!pkgs/**/*.desktop
+!pkgs/**/*.asc
+
+# --- editor / OS noise ---
+*.swp
+*~
+.DS_Store
