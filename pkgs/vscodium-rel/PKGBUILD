@@ -1,18 +1,17 @@
 # Maintainer: Eihdran Lego <hadean-eon-dev@proton.me>
 
 pkgname=vscodium-rel
-_repo="VSCodium/vscodium"
 pkgver=1.121.03429
 pkgrel=1
 pkgdesc="VSCodium standalone CLI, installed from the prebuilt release tarball"
 arch=('x86_64')
+_repo="VSCodium/vscodium"
 url="https://github.com/${_repo}"
+
 license=('MIT')
 options=(!strip !debug)
 provides=('codium')
 conflicts=('codium')
-# Pinned release. Run `pkgctl version upgrade` (uses .nvchecker.toml) to bump
-# pkgver to the latest tag, then `updpkgsums` to refresh the checksum.
 source=("vscodium-cli-${pkgver}.tar.gz::${url}/releases/download/${pkgver}/vscodium-cli-linux-x64-${pkgver}.tar.gz")
 sha256sums=('fbb9ed2c328e6dc98d0f2bc7df86da3748de35226c7d3b4cfadbc57742a87f32')
 

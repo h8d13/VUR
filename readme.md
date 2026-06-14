@@ -1,4 +1,4 @@
-# Arch Closed Repository
+# Arch Closed Repository - State
 
 - All commits require:
 	- A valid `GPG` key to sign all commits + SSH setup (web commits will not be accepted)
@@ -47,9 +47,16 @@ Repo-root helper scripts:
   non-zero on any violation.
 - `./clean` — remove all git-ignored build debris (`pkg/`, `src/`, fetched
   sources, built packages) repo-wide, after a confirmation prompt.
+- `./bumprels [pkg...]` — for every release-tracked package (one with a
+  `.nvchecker.toml`), bump `pkgver` to the latest upstream tag, refresh
+  checksums, and regenerate `.SRCINFO`. With no args, bumps them all.
+
+Packaging you'll want: `nvchecker`, `devtools`, `base-devel` and `pacman-contrib`.
 
 ## CI
 
 GitHub Actions (`.github/workflows/check.yml`) runs `bash check` on **every
 branch push and every pull request**. A branch that violates any package rule
 fails CI and cannot be merged into `master`.
+
+---

@@ -1,0 +1,54 @@
+#!/bin/bash
+# bumprels — bump release-tracked packages to their latest upstream version.
+#
+# For each package that has a .nvchecker.toml (typically the -rel tier), this:
+#   1. pkgctl version upgrade   — stamp pkgver from the latest upstream tag
+#   2. updpkgsums               — refresh source checksums for the new version
+#   3. makepkg --printsrcinfo   — regenerate .SRCINFO
+#
+# Usage, from the repo root:
+#   ./bumprels                  # bump every package with a .nvchecker.toml
+#   ./bumprels vscodium-rel ... # bump only the named package(s)
+set -u
+shopt -s nullglob
+
+# Build the target list: explicit args, or every pkg with a .nvchecker.toml.
+targets=()
+if (( $# > 0 )); then
+	for n in "$@"; do targets+=("pkgs/$n"); done
+else
+	for toml in pkgs/*/.nvchecker.toml; do targets+=("$(dirname "$toml")"); done
+fi
+
+if (( ${#targets[@]} == 0 )); then
+	echo "nothing to bump: no package has a .nvchecker.toml"
+	exit 0
+fi
+
+rc=0
+for dir in "${targets[@]}"; do
+	name=$(basename "$dir")
+	if [[ ! -f "$dir/PKGBUILD" ]]; then
+		echo "skip [$name]: no PKGBUILD"; rc=1; continue
+	fi
+	if [[ ! -f "$dir/.nvchecker.toml" ]]; then
+		echo "skip [$name]: no .nvchecker.toml (not release-tracked)"; continue
+	fi
+
+	old=$(sed -n "s/^pkgver=//p" "$dir/PKGBUILD" | head -1)
+	echo "==> $name (current $old)"
+	if ( cd "$dir" \
+		&& pkgctl version upgrade \
+		&& updpkgsums \
+		&& makepkg --printsrcinfo > .SRCINFO ); then
+		new=$(sed -n "s/^pkgver=//p" "$dir/PKGBUILD" | head -1)
+		if [[ "$old" == "$new" ]]; then
+			echo "    already latest ($new)"
+		else
+			echo "    bumped $old -> $new"
+		fi
+	else
+		echo "FAIL [$name]: bump failed"; rc=1
+	fi
+done
+exit $rc
