@@ -1,0 +1,7 @@
+#!/bin/bash
+git clean -Xnd
+
+read -rp "Proceed? [y/N] " reply
+[[ "${reply}" == [yY] ]] || { echo "aborted"; exit 0; }
+
+git clean -Xfd
