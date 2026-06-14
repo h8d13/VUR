@@ -21,7 +21,6 @@ pkgs/**/src/
 !pkgs/**/.SRCINFO
 !pkgs/**/.gitignore
 !pkgs/**/.nvchecker.toml
-!pkgs/**/*.install
 !pkgs/**/*.patch
 !pkgs/**/*.diff
 !pkgs/**/*.hook
