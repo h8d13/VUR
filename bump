@@ -1,0 +1,59 @@
+#!/bin/bash
+# bump — refresh packages to their latest upstream state, by tier.
+#
+#   *-rel  (releases/download source): pkgctl version upgrade + updpkgsums
+#   *-git  (git+ VCS source):          re-clone + rerun pkgver()
+# Both then regenerate .SRCINFO. (-git has no hashes to bump — git's commit
+# ref is the integrity check — so updpkgsums is skipped for it.)
+#
+# Usage, from the repo root:
+#   ./bump              # refresh every package under pkgs/
+#   ./bump <pkg> ...    # refresh only the named package(s)
+set -u
+shopt -s nullglob
+
+targets=()
+if (( $# > 0 )); then
+	for n in "$@"; do targets+=("pkgs/$n"); done
+else
+	for pb in pkgs/*/PKGBUILD; do targets+=("$(dirname "$pb")"); done
+fi
+
+(( ${#targets[@]} )) || { echo "no packages found under pkgs/"; exit 0; }
+
+rc=0
+for dir in "${targets[@]}"; do
+	name=$(basename "$dir")
+	[[ "$name" == "template" ]] && continue
+	[[ -f "$dir/PKGBUILD" ]] || { echo "skip [$name]: no PKGBUILD"; rc=1; continue; }
+
+	old=$(sed -n "s/^pkgver=//p" "$dir/PKGBUILD" | head -1)
+	echo "==> $name (current $old)"
+	case "$name" in
+		*-rel)
+			( cd "$dir" && pkgctl version upgrade && updpkgsums \
+				&& makepkg --printsrcinfo > .SRCINFO )
+			ok=$?
+			;;
+		*-git)
+			( cd "$dir" && makepkg -od --noprepare \
+				&& makepkg --printsrcinfo > .SRCINFO )
+			ok=$?
+			;;
+		*)
+			echo "    skip: not a -git/-rel package"; continue
+			;;
+	esac
+
+	if (( ok == 0 )); then
+		new=$(sed -n "s/^pkgver=//p" "$dir/PKGBUILD" | head -1)
+		if [[ "$old" == "$new" ]]; then
+			echo "    already latest ($new)"
+		else
+			echo "    bumped $old -> $new"
+		fi
+	else
+		echo "FAIL [$name]: refresh failed"; rc=1
+	fi
+done
+exit $rc

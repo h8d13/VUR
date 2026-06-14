@@ -47,9 +47,10 @@ Repo-root helper scripts:
   non-zero on any violation.
 - `./clean` — remove all git-ignored build debris (`pkg/`, `src/`, fetched
   sources, built packages) repo-wide, after a confirmation prompt.
-- `./bumprels [pkg...]` — for every release-tracked package (one with a
-  `.nvchecker.toml`), bump `pkgver` to the latest upstream tag, refresh
-  checksums, and regenerate `.SRCINFO`. With no args, bumps them all.
+- `./bump [pkg...]` — refresh packages to the latest upstream state, by tier:
+  `*-rel` runs `pkgctl version upgrade` + `updpkgsums`; `*-git` re-clones and
+  reruns `pkgver()` (no hashes to bump — git's ref is the integrity check).
+  Both regenerate `.SRCINFO`. With no args, refreshes them all.
 
 Packaging you'll want: `nvchecker`, `devtools`, `base-devel` and `pacman-contrib`.
 
