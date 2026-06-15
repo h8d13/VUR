@@ -19,9 +19,15 @@ Every `pkgs/<name>/` recipe must satisfy (enforced by `./check`):
    - `-rel` — `source=()` is a `releases/download/` URL (a published git tag).
 
    Both track upstream git; they differ only in whether we build the clone or
-   install a published release artifact. No other suffix is allowed.
-2. **No `.install` scriptlets** no `install=` line and no `*.install` file.
-   `*.install` is not on the allowlist, so it cannot even be committed.
+   install a published release artifact. No other source suffix is allowed.
+   A trailing `-sys` may be appended to either (`-git-sys` / `-rel-sys`) — see
+   rule 2.
+2. **No `.install` scriptlets, unless the package is `-sys`.** By default a
+   recipe may have no `install=` line and no `*.install` file. A package that
+   genuinely needs pre/post scriptlets (systemd units, user creation, cache
+   refresh, …) must opt in by appending `-sys` to its `pkgname`
+   (e.g. `foo-git-sys`). Only `*-sys/` dirs can commit a `*.install` — the
+   allowlist forbids it everywhere else.
 3. **At least one `# Maintainer:` line** in the PKGBUILD.
 
 Run `./check` before committing; CI runs it on every PR.
@@ -45,6 +51,9 @@ Repo-root helper scripts:
 
 - `./check` — validate every recipe against the package rules above. Exits
   non-zero on any violation.
+- `./dco [<range>]` — verify every non-merge commit in `<range>` (default
+  `origin/master..HEAD`) carries a `Signed-off-by:` trailer matching its
+  author. Homebaked DCO check; CI runs it on every push and PR.
 - `./clean` — remove all git-ignored build debris (`pkg/`, `src/`, fetched
   sources, built packages) repo-wide, after a confirmation prompt.
 - `./bump [pkg...]` — refresh packages to the latest upstream state, by tier:
@@ -56,8 +65,9 @@ Packaging you'll want: `nvchecker`, `devtools`, `base-devel` and `pacman-contrib
 
 ## CI
 
-GitHub Actions (`.github/workflows/check.yml`) runs `bash check` on **every
-branch push and every pull request**. A branch that violates any package rule
-fails CI and cannot be merged into `master`.
+GitHub Actions (`.github/workflows/check.yml`) runs two jobs on **every branch
+push and every pull request**: `policy` (`bash check`) and `dco` (`bash dco`).
+A branch that violates any package rule, or carries a commit without a matching
+`Signed-off-by:` trailer, fails CI and cannot be merged into `master`.
 
 ---

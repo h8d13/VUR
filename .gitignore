@@ -29,6 +29,8 @@ pkgs/**/src/
 !pkgs/**/*.tmpfiles
 !pkgs/**/*.desktop
 !pkgs/**/*.asc
+# .install scriptlets only in -sys recipe dirs (the suffix that opts in).
+!pkgs/*-sys/*.install
 
 # --- editor / OS noise ---
 *.swp

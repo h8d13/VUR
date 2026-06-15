@@ -1,11 +1,12 @@
 #!/bin/bash
 # ACR policy checks. Run from the repo root: ./check
 # Validates every pkgs/<name>/PKGBUILD against the repository rules.
-#   1. tracked-upstream source, by suffix:
-#        *-git  -> source must be a git+ VCS source
-#        *-rel  -> source must be a releases/download/ URL (a published git tag)
+#   1. tracked-upstream source, by suffix (an optional trailing -sys is allowed):
+#        *-git[-sys] -> source must be a git+ VCS source
+#        *-rel[-sys] -> source must be a releases/download/ URL (a published git tag)
 #      any other pkgname suffix is rejected.
 #   2. no .install pre/post scriptlets (no install= line, no *.install file)
+#      UNLESS the pkgname ends in -sys, which opts in to allowing them.
 #   3. at least one '# Maintainer:' line
 set -u
 shopt -s nullglob
@@ -22,33 +23,35 @@ for pkgbuild in pkgs/*/PKGBUILD; do
 	# Rule 1: tracked-upstream source, validated against the pkgname suffix
 	pkgname=$(sed -n "s/^pkgname=//p" "$pkgbuild" | tr -d "'\"" | head -1)
 	case "$pkgname" in
-		*-git)
+		*-git|*-git-sys)
 			if ! grep -qE '^[[:space:]]*source.*=.*git\+' "$pkgbuild"; then
 				echo "FAIL [$name]: -git package has no git+ VCS source"
 				fail=1
 			fi
 			;;
-		*-rel)
+		*-rel|*-rel-sys)
 			if ! grep -qE '^[[:space:]]*source.*=.*releases/download/' "$pkgbuild"; then
 				echo "FAIL [$name]: -rel package has no releases/download/ source"
 				fail=1
 			fi
 			;;
 		*)
-			echo "FAIL [$name]: pkgname '$pkgname' must end in -git or -rel"
+			echo "FAIL [$name]: pkgname '$pkgname' must end in -git or -rel (optionally + -sys)"
 			fail=1
 			;;
 	esac
 
-	# Rule 2: no install scriptlets
-	if grep -qE '^[[:space:]]*install=' "$pkgbuild"; then
-		echo "FAIL [$name]: install= scriptlet declared in PKGBUILD"
-		fail=1
-	fi
-	installs=("$dir"/*.install)
-	if (( ${#installs[@]} > 0 )); then
-		echo "FAIL [$name]: .install file present in recipe dir"
-		fail=1
+	# Rule 2: no install scriptlets, unless the pkgname opts in with a -sys suffix
+	if [[ "$pkgname" != *-sys ]]; then
+		if grep -qE '^[[:space:]]*install=' "$pkgbuild"; then
+			echo "FAIL [$name]: install= scriptlet declared in PKGBUILD (use a -sys suffix to allow)"
+			fail=1
+		fi
+		installs=("$dir"/*.install)
+		if (( ${#installs[@]} > 0 )); then
+			echo "FAIL [$name]: .install file present in recipe dir (use a -sys suffix to allow)"
+			fail=1
+		fi
 	fi
 
 	# Rule 3: at least one Maintainer line
