@@ -1,0 +1,9 @@
+version = 1
+
+# Packaging files in this recipe are licensed 0BSD (Arch convention),
+# independent of the upstream project's own license.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Eihdran Lego <hadean-eon-dev@proton.me>"
+SPDX-License-Identifier = "0BSD"

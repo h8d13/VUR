@@ -1,0 +1,4 @@
+[speedtest-cli-git]
+source = "git"
+git = "https://github.com/h8d13/speedtest-cli.git"
+use_commit = true

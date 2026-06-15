@@ -1,0 +1,23 @@
+# acrlib shared ACR helpers, sourced by ./check and ./bump.
+# Single source of truth for the package-suffix scheme so the tools can't
+# drift apart (e.g. one of them forgetting the -sys variants).
+#
+#   <name>-git[-sys]  -> tier "git"  (git+ VCS source)
+#   <name>-rel[-sys]  -> tier "rel"  (releases/download/ source)
+#   trailing -sys      -> opts in to .install scriptlets
+#
+# Usage: source "$(dirname "$0")/acrlib"
+
+# acr_tier <pkgname> -> prints "git" | "rel" | "" (unknown), ignoring -sys.
+acr_tier() {
+	case "$1" in
+		*-git|*-git-sys) echo git ;;
+		*-rel|*-rel-sys) echo rel ;;
+		*)               echo ""  ;;
+	esac
+}
+
+# acr_is_sys <pkgname> -> exit 0 if the package opts in to install scriptlets.
+acr_is_sys() {
+	[[ "$1" == *-sys ]]
+}

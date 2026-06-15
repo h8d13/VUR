@@ -1,0 +1,4 @@
+[apc-git]
+source = "git"
+git = "https://github.com/h8d13/apc.git"
+use_commit = true

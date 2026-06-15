@@ -11,6 +11,8 @@
 set -u
 shopt -s nullglob
 
+source "$(dirname "$0")/acrlib"
+
 fail=0
 checked=0
 
@@ -22,14 +24,14 @@ for pkgbuild in pkgs/*/PKGBUILD; do
 
 	# Rule 1: tracked-upstream source, validated against the pkgname suffix
 	pkgname=$(sed -n "s/^pkgname=//p" "$pkgbuild" | tr -d "'\"" | head -1)
-	case "$pkgname" in
-		*-git|*-git-sys)
+	case "$(acr_tier "$pkgname")" in
+		git)
 			if ! grep -qE '^[[:space:]]*source.*=.*git\+' "$pkgbuild"; then
 				echo "FAIL [$name]: -git package has no git+ VCS source"
 				fail=1
 			fi
 			;;
-		*-rel|*-rel-sys)
+		rel)
 			if ! grep -qE '^[[:space:]]*source.*=.*releases/download/' "$pkgbuild"; then
 				echo "FAIL [$name]: -rel package has no releases/download/ source"
 				fail=1
@@ -42,7 +44,7 @@ for pkgbuild in pkgs/*/PKGBUILD; do
 	esac
 
 	# Rule 2: no install scriptlets, unless the pkgname opts in with a -sys suffix
-	if [[ "$pkgname" != *-sys ]]; then
+	if ! acr_is_sys "$pkgname"; then
 		if grep -qE '^[[:space:]]*install=' "$pkgbuild"; then
 			echo "FAIL [$name]: install= scriptlet declared in PKGBUILD (use a -sys suffix to allow)"
 			fail=1

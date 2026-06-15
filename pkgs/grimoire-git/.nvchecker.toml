@@ -1,0 +1,5 @@
+[grimoire-git]
+source = "git"
+git = "https://github.com/h8d13/grimoire.git"
+use_commit = true
+branch = "dot-cache"

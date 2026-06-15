@@ -12,6 +12,8 @@
 set -u
 shopt -s nullglob
 
+source "$(dirname "$0")/acrlib"
+
 targets=()
 if (( $# > 0 )); then
 	for n in "$@"; do targets+=("pkgs/$n"); done
@@ -29,13 +31,13 @@ for dir in "${targets[@]}"; do
 
 	old=$(sed -n "s/^pkgver=//p" "$dir/PKGBUILD" | head -1)
 	echo "==> $name (current $old)"
-	case "$name" in
-		*-rel)
+	case "$(acr_tier "$name")" in
+		rel)
 			( cd "$dir" && pkgctl version upgrade && updpkgsums \
 				&& makepkg --printsrcinfo > .SRCINFO )
 			ok=$?
 			;;
-		*-git)
+		git)
 			( cd "$dir" && makepkg -od --noprepare \
 				&& makepkg --printsrcinfo > .SRCINFO )
 			ok=$?
