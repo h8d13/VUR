@@ -1,7 +1,11 @@
 #!/bin/bash
-git clean -Xnd
+# -X  remove ignored files only (tracked/unknown files are left alone)
+# -d  recurse into directories
+# -ff force twice: the second -f is required to delete nested git repos
+set -u
+git clean -Xffdn
 
 read -rp "Proceed? [y/N] " reply
 [[ "${reply}" == [yY] ]] || { echo "aborted"; exit 0; }
 
-git clean -Xfd
+git clean -Xffd

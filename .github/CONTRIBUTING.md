@@ -54,7 +54,9 @@ Repo-root helper scripts:
   `origin/master..HEAD`) carries a `Signed-off-by:` trailer matching its
   author. Homebaked DCO check; CI runs it on every push and PR.
 - `./clean` — remove all git-ignored build debris (`pkg/`, `src/`, fetched
-  sources, built packages) repo-wide, after a confirmation prompt.
+  sources, built packages, and makepkg's persistent git mirror clones)
+  repo-wide, after a confirmation prompt. Uses `git clean -Xffd`; the double
+  `-f` is needed to delete the embedded git checkouts makepkg leaves behind.
 - `./bump [pkg...]` — refresh packages to the latest upstream state, by tier:
   `*-rel` runs `pkgctl version upgrade` + `updpkgsums`; `*-git` re-clones and
   reruns `pkgver()` (no hashes to bump — git's ref is the integrity check).

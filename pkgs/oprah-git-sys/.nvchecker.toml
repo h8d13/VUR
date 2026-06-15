@@ -1,0 +1,4 @@
+[oprah-git-sys]
+source = "git"
+git = "https://github.com/h8d13/oprah.git"
+use_commit = true

@@ -1,0 +1,28 @@
+# Maintainer: Eihdran Lego <hadean-eon-dev@proton.me>
+
+pkgname=oprah-git-sys
+pkgver=r1.gd416fa6
+pkgrel=1
+pkgdesc="Pacman hook that lists orphaned packages after each transaction"
+arch=('any')
+_repo="h8d13/oprah"
+url="https://github.com/${_repo}"
+
+license=('0BSD')
+depends=('pacman')
+provides=('oprah')
+conflicts=('oprah')
+install="oprah.install"
+source=("$pkgname::git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+	cd "${srcdir}/${pkgname}"
+	printf 'r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+	cd "${srcdir}/${pkgname}"
+	install -Dm755 check-orphans "${pkgdir}/usr/share/libalpm/scripts/check-orphans"
+	install -Dm644 check-orphans.hook "${pkgdir}/usr/share/libalpm/hooks/check-orphans.hook"
+}

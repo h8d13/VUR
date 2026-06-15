@@ -12,26 +12,33 @@ src/
 # (!pkgs/**/ lets git descend into dirs to find the allowed files.)
 pkgs/**
 !pkgs/**/
-# ...but never descend back into makepkg build dirs (!pkgs/**/ re-included them).
-# Without this, an embedded VCS checkout under src/ leaks in as a git submodule.
-pkgs/**/pkg/
-pkgs/**/src/
-!pkgs/**/.directory
-!pkgs/**/PKGBUILD
-!pkgs/**/.SRCINFO
-!pkgs/**/.gitignore
-!pkgs/**/.nvchecker.toml
-!pkgs/**/REUSE.toml
-!pkgs/**/*.patch
-!pkgs/**/*.diff
-!pkgs/**/*.hook
-!pkgs/**/*.service
-!pkgs/**/*.sysusers
-!pkgs/**/*.tmpfiles
-!pkgs/**/*.desktop
-!pkgs/**/*.asc
+# Real recipe files live DIRECTLY in pkgs/<name>/. Re-ignore every subdirectory
+# of a recipe — makepkg's src/ and pkg/, and the persistent git mirror clone at
+# pkgs/<name>/<pkgname>/. Otherwise an upstream-shipped *.hook (or *.service,
+# *.desktop, ...) inside a clone would leak via the file allowlist below, and
+# the clone's embedded .git would be added as a gitlink. keys/ is re-allowed
+# right after as the one legitimate nested location.
+pkgs/*/*/
+!pkgs/*/keys/
+# Allowlisted files are matched ONE level deep (pkgs/*/FILE), never pkgs/**/FILE,
+# so nothing inside a re-ignored subdir can sneak back in.
+!pkgs/*/.directory
+!pkgs/*/PKGBUILD
+!pkgs/*/.SRCINFO
+!pkgs/*/.gitignore
+!pkgs/*/.nvchecker.toml
+!pkgs/*/REUSE.toml
+!pkgs/*/*.patch
+!pkgs/*/*.diff
+!pkgs/*/*.hook
+!pkgs/*/*.service
+!pkgs/*/*.sysusers
+!pkgs/*/*.tmpfiles
+!pkgs/*/*.desktop
 # .install scriptlets only in -sys recipe dirs (the suffix that opts in).
 !pkgs/*-sys/*.install
+# Detached signatures: the one allowed nested location (keys/pgp/*.asc).
+!pkgs/*/keys/**/*.asc
 
 # --- editor / OS noise ---
 *.swp
