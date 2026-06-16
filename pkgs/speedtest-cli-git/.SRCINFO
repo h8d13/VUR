@@ -1,6 +1,6 @@
 pkgbase = speedtest-cli-git
 	pkgdesc = CLI for testing internet bandwidth using speedtest.net (py3 fork)
-	pkgver = r315.gb2d73e9
+	pkgver = r317.g954418b
 	pkgrel = 1
 	url = https://github.com/h8d13/speedtest-cli
 	arch = any

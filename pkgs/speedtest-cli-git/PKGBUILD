@@ -1,7 +1,7 @@
 # Maintainer: Eihdran Lego <hadean-eon-dev@proton.me>
 
 pkgname=speedtest-cli-git
-pkgver=r315.gb2d73e9
+pkgver=r317.g954418b
 pkgrel=1
 pkgdesc='CLI for testing internet bandwidth using speedtest.net (py3 fork)'
 arch=('any')

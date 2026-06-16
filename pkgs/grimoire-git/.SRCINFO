@@ -1,6 +1,6 @@
 pkgbase = grimoire-git
 	pkgdesc = Lightweight AUR helper that uses the official AUR git mirror
-	pkgver = r244.g8238afe
+	pkgver = r280.g265bf62
 	pkgrel = 1
 	url = https://github.com/mackilanu/grimoire
 	arch = any
