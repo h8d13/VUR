@@ -1,6 +1,6 @@
 pkgbase = apc-git
 	pkgdesc = Lightweight bash wrapper for Pacman.
-	pkgver = r61.g2e0d42b
+	pkgver = r62.g59a44b7
 	pkgrel = 1
 	url = https://github.com/h8d13/apc
 	arch = any

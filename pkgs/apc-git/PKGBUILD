@@ -1,7 +1,7 @@
 # Maintainer: Eihdran Lego <hadean-eon-dev@proton.me>
 
 pkgname=apc-git
-pkgver=r61.g2e0d42b
+pkgver=r62.g59a44b7
 pkgrel=1
 pkgdesc="Lightweight bash wrapper for Pacman."
 arch=('any')
